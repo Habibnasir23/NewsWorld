@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins;700&display=swap">
     <link rel="stylesheet" href="../WorldNews/wwwroot/css/site.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
 
@@ -65,10 +66,6 @@
 
         let map;
         let markersArray = [];
-        const allMarkers = [
-            ["New York", 40.712776, -74.005974, 'https://images.pexels.com/photos/18844140/pexels-photo-18844140/free-photo-of-building-of-natwest-bank-in-llandudno.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', 'Heading', 'This is the summary'],
-            [],
-        ];
         var bounds;
         function initMap() {
 
@@ -105,6 +102,8 @@
             })
 
             displayRandomMarkers();
+            bounds = map.getBounds();
+            refreshMarkers(bounds);
         }
 
         var modal = document.getElementById("myModal");
@@ -120,17 +119,19 @@
                 modal.style.display = "none";
             }
         }
-
+        const genNews = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.2 by fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M96 96c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H80c-44.2 0-80-35.8-80-80V128c0-17.7 14.3-32 32-32s32 14.3 32 32V400c0 8.8 7.2 16 16 16s16-7.2 16-16V96zm64 24v80c0 13.3 10.7 24 24 24H296c13.3 0 24-10.7 24-24V120c0-13.3-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm208-8c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zM160 304c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>`;
         function displayRandomMarkers() {
             clearMarkers();
+            const shuffledNewsData = shuffleArray([...newsData]).slice(0, 5);
 
-            newsData.forEach((newsItem) => {
+            shuffledNewsData.forEach((newsItem) => {
                 const marker = new google.maps.Marker({
                     position: { lat: newsItem.lat, lng: newsItem.lng },
                     map,
                     title: newsItem.header,
                     icon: {
-                        // Your icon configuration
+                        url: 'data:image/svg+xml,' + encodeURIComponent(genNews),
+                        scaledSize: new google.maps.Size(30, 30),
                     },
                     animation: google.maps.Animation.DROP,
                 });
@@ -138,8 +139,10 @@
                 markersArray.push(marker);
 
                 const infowindow = new google.maps.InfoWindow({
-                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.header}</div>`,
+                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header.replace(/'/g, "\\'")}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header.replace(/'/g, "\\'")}', '${newsItem.summary.replace(/'/g, "\\'")}')"><br>${newsItem.header}</div>`,
                 });
+
+
 
                 marker.addListener('click', () => {
                     infowindow.open(map, marker);
@@ -149,6 +152,7 @@
         }
 
         function showModal(latitude, longitude, heading, summary) {
+            console.log("Inside showmodal");
             var streetViewBaseUrl = "https://www.google.com/maps/embed/v1/streetview";
             var apiKey = "AIzaSyDEAoLt5spf_-yVTE33N8__r6oFPcEGtp4";
             var streetViewUrl = `${streetViewBaseUrl}?key=${apiKey}&location=${latitude},${longitude}`;
@@ -166,33 +170,40 @@
 
         function refreshMarkers(bounds) {
             clearMarkers();
-            allMarkers.forEach((location) => {
-                const latLng = new google.maps.LatLng(location[1], location[2]);
-                if (bounds.contains(latLng)) {
-                    const genNews = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.2 by fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M96 96c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H80c-44.2 0-80-35.8-80-80V128c0-17.7 14.3-32 32-32s32 14.3 32 32V400c0 8.8 7.2 16 16 16s16-7.2 16-16V96zm64 24v80c0 13.3 10.7 24 24 24H296c13.3 0 24-10.7 24-24V120c0-13.3-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm208-8c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zM160 304c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>`;
+            const shuffledNewsData = shuffleArray([...newsData]).slice(0, 5);
+
+            shuffledNewsData.forEach((newsItem) => {
+                const latLng = new google.maps.LatLng(newsItem.lat, newsItem.lng);
+                if (bounds.contains(latLng)) { // Check if the marker is within the current map bounds
                     const marker = new google.maps.Marker({
-                        position: { lat: location[1], lng: location[2] },
-                        map,
-                        title: "Click me!",
+                        position: { lat: newsItem.lat, lng: newsItem.lng },
+                        map: map,
+                        title: newsItem.header,
                         icon: {
-                            url: 'data:image/svg+xml,' + encodeURIComponent(genNews), // Convert SVG to data URI
-                            scaledSize: new google.maps.Size(30, 30),
+                            // Your icon configuration
                         },
                         animation: google.maps.Animation.DROP,
                     });
 
-                    markersArray.push(marker);
+                    markersArray.push(marker); // Add the marker to the markersArray
 
                     const infowindow = new google.maps.InfoWindow({
-                        content: `<div style="text-align:center;"><img src="${location[3]}" alt="${location[0]}" style="width:100px; cursor:pointer;" onclick="showModal(${location[1]}, ${location[2]}, '${location[4]}', '${location[5]}')"><br>${location[0]}</div>`,
+                        content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header.replace(/'/g, "\\'")}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header.replace(/'/g, "\\'")}', '${newsItem.summary.replace(/'/g, "\\'")}')"><br>${newsItem.header}</div>`,
                     });
 
+
+                    // Open the info window immediately after placing the marker
                     infowindow.open(map, marker);
-                    //marker.addListener('click', () => {
-                    //  infowindow.open(map, marker);
-                    //});
                 }
             });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
         }
 
 
