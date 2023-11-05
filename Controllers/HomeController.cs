@@ -48,7 +48,7 @@ namespace NewsWorld.Controllers
 
                             _context.News.Add(news);
                         }
-                        _context.SaveChanges();
+                        //_context.SaveChanges();
                     }
                 }
             }
@@ -66,9 +66,13 @@ namespace NewsWorld.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult Map()
+        public async Task<IActionResult> Map()
         {
-            return View();
+            /*var applicationDbcontext = _context.News.Include(t => t.Id);*/
+
+            var newsData = await _context.News.ToListAsync();
+
+            return View(newsData);
         }
     }
 }

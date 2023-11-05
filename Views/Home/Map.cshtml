@@ -1,4 +1,4 @@
-﻿@model IEnumerable<NewsWorld.Models.News>
+﻿@model IEnumerable<News>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -72,6 +72,21 @@
             ["Tokyo", 35.689487, 139.691711, 'https://images.pexels.com/photos/16064875/pexels-photo-16064875/free-photo-of-white-flowers-in-nature.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
             ["London", 51.507351, -0.127758, 'https://images.pexels.com/photos/17960588/pexels-photo-17960588/free-photo-of-basketball-hoop-in-the-sunlight.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"]
         ];
+
+
+        var singleNews = []
+
+        var NewsDataSet = []
+
+        var newsData = @Html.Raw(Json.Serialize(Model));
+
+        // Now you can use newsData as a JavaScript array of objects
+        
+       
+
+        
+
+
         var bounds;
         function initMap() {
 
@@ -127,14 +142,24 @@
         function displayRandomMarkers() {
             clearMarkers();
             // Shuffle the array and slice it to get 5 random locations
-            const shuffledMarkers = allMarkers.sort(() => 0.5 - Math.random()).slice(0, 5);
 
-            shuffledMarkers.forEach((location) => {
+            let randomIndices = new Set();
+
+            while (randomIndices.size < 5) {
+                let randomIndex = Math.floor(Math.random() * NewsDataSet.length());
+                randomIndices.add(randomIndex);
+            }
+
+            //const shuffledMarkers = allMarkers.sort(() => 0.5 - Math.random()).slice(0, 5);
+            
+
+
+            randomIndices.forEach((index)) {
 
                 const marker = new google.maps.Marker({
-                    position: { lat: location[1], lng: location[2] },
+                    position: { lat: NewsDataSet[index].lat, lng: NewsDataSet[index].lng },
                     map,
-                    title: location[0],
+                    title: "",
                     animation: google.maps.Animation.DROP,
                 });
 
@@ -142,7 +167,7 @@
 
 
                 const infowindow = new google.maps.InfoWindow({
-                    content: `<div style="text-align:center;"><img src="${location[3]}" alt="${location[0]}" style="width:100px; cursor:pointer;" onclick="showModal(${location[1]}, ${location[2]}, '${location[4]}', '${location[5]}')"><br>${location[0]}</div>`,
+                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.type}</div>`,
                 });
 
                 infowindow.open(map, marker);
@@ -170,27 +195,25 @@
 
         function refreshMarkers(bounds) {
             clearMarkers();
-            allMarkers.forEach((location) => {
-                const latLng = new google.maps.LatLng(location[1], location[2]);
-                if (bounds.contains(latLng)) {
-                    const marker = new google.maps.Marker({
-                        position: latLng,
-                        map,
-                        title: location[0],
-                        animation: google.maps.Animation.DROP,
-                    });
+            newsData.forEach(function (newsItem) {
+                
+                // You can create markers or other elements based on this data
+                const marker = new google.maps.Marker({
+                    position: { lat: newsItem.lat, lng: newsItem.lng },
+                    map,
+                    title: "Holder",
+                    animation: google.maps.Animation.DROP,
+                });
+                NewsDataSet.push(marker);
 
-                    markersArray.push(marker);
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.type}</div>`,
+                });
 
-                    const infowindow = new google.maps.InfoWindow({
-                        content: `<div style="text-align:center;"><img src="${location[3]}" alt="${location[0]}" style="width:100px; cursor:pointer;" onclick="showModal(${location[1]}, ${location[2]}, '${location[4]}', '${location[5]}')"><br>${location[0]}</div>`,
-                    });
-
-                    infowindow.open(map, marker);
-                    //marker.addListener('click', () => {
-                    //  infowindow.open(map, marker);
-                    //});
-                }
+                infowindow.open(map, marker);
+                //marker.addListener('click', () => {
+                //  infowindow.open(map, marker);
+                //});
             });
         }
 
