@@ -1,4 +1,4 @@
-﻿@model IEnumerable<News>
+﻿@model IEnumerable<NewsWorld.Models.News>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,30 +8,33 @@
     <title>WorldNews</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins;700&display=swap">
     <link rel="stylesheet" href="../WorldNews/wwwroot/css/site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <h1>Welcome to WorldNews!</h1>
-
+    <h1>Have fun looking around!</h1>
     <!-- "How to Use" Dialog -->
     <div id="howToUseDialog" class="dialog">
         <div class="dialog-content">
             <h2>About WorldNews</h2>
-            <p>Welcome to our TigerHacks submission! Here's a quick guide on what we offer and how to use it:</p>
+            <p>Welcome to our TigerHacks submission! Here's a quick guide on what we offer and how to use WorldNews.</p>
             <ul class="left-align-list">
                 <li>We offer an immersive experience through a map that gives you trending news from across the world. </li>
                 <li>
                     As you scroll, or zoom, across the world map, the news you see is randomly generated; we want to <br />
-                    show you each part of the world.
+                    show you different part of the world, and grow your overall knowledge base.
                 </li>
-                <li>Once you tap an icon, you will see some basic information, and if it interests you, navigate to it!</li>
+                <li>
+                    Once you tap an icon, you will see some basic information about an article, and if it interests <br />
+                    you, navigate to it!
+                </li>
                 <li>
                     To make this experience truly immersive, we embedded Google maps' street view feature to get an idea<br />
                     of what the news article's topic's environment is like.
                 </li>
                 <li>Enjoy!</li>
             </ul>
-            <p>Made by MohammadHossein Momeni, Habib Nasir, Mohammed Abdikebir, and Krishna Chebolu</p>
+            <p>Made by MohammadHossein Momeni, Habib Nasir, Mohammed Abdikebir, and Krishna Chebolu representing Truman!</p>
             <button id="closeHowToUseButton">Got it!</button>
         </div>
     </div>
@@ -58,35 +61,14 @@
 
     <script>
 
+        var newsData = @Html.Raw(Json.Serialize(Model));
+
         let map;
         let markersArray = [];
         const allMarkers = [
             ["New York", 40.712776, -74.005974, 'https://images.pexels.com/photos/18844140/pexels-photo-18844140/free-photo-of-building-of-natwest-bank-in-llandudno.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', 'Heading', 'This is the summary'],
-            ["Sydney", -33.868820, 151.209290, 'https://images.pexels.com/photos/16776919/pexels-photo-16776919/free-photo-of-blue-motor-scooter-standing-outside-a-beauty-center.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["Rio de Janeiro", -22.906847, -43.172897, 'https://images.pexels.com/photos/14661918/pexels-photo-14661918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["Cape Town", -33.924870, 18.424055, 'https://images.pexels.com/photos/18937801/pexels-photo-18937801/free-photo-of-wanna-play-football-or-drone.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["Moscow", 55.755825, 37.617298, 'https://images.pexels.com/photos/15524939/pexels-photo-15524939/free-photo-of-rock-formation-in-sea.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["Beijing", 39.904202, 116.407394, 'https://images.pexels.com/photos/18325774/pexels-photo-18325774/free-photo-of-cheese-daisy.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["Cairo", 30.044420, 31.235712, 'https://images.pexels.com/photos/17265260/pexels-photo-17265260/free-photo-of-exterior-of-a-skyscraper.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["New Delhi", 28.613939, 77.209023, 'https://images.pexels.com/photos/17389140/pexels-photo-17389140/free-photo-of-a-large-ferris-wheel-against-a-blue-sky.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load', "Heading", "This is the summary"],
-            ["Tokyo", 35.689487, 139.691711, 'https://images.pexels.com/photos/16064875/pexels-photo-16064875/free-photo-of-white-flowers-in-nature.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"],
-            ["London", 51.507351, -0.127758, 'https://images.pexels.com/photos/17960588/pexels-photo-17960588/free-photo-of-basketball-hoop-in-the-sunlight.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', "Heading", "This is the summary"]
+            [],
         ];
-
-
-        var singleNews = []
-
-        var NewsDataSet = []
-
-        var newsData = @Html.Raw(Json.Serialize(Model));
-
-        // Now you can use newsData as a JavaScript array of objects
-        
-       
-
-        
-
-
         var bounds;
         function initMap() {
 
@@ -141,40 +123,29 @@
 
         function displayRandomMarkers() {
             clearMarkers();
-            // Shuffle the array and slice it to get 5 random locations
 
-            let randomIndices = new Set();
-
-            while (randomIndices.size < 5) {
-                let randomIndex = Math.floor(Math.random() * NewsDataSet.length());
-                randomIndices.add(randomIndex);
-            }
-
-            //const shuffledMarkers = allMarkers.sort(() => 0.5 - Math.random()).slice(0, 5);
-            
-
-
-            randomIndices.forEach((index)) {
-
+            newsData.forEach((newsItem) => {
                 const marker = new google.maps.Marker({
-                    position: { lat: NewsDataSet[index].lat, lng: NewsDataSet[index].lng },
+                    position: { lat: newsItem.lat, lng: newsItem.lng },
                     map,
-                    title: "",
+                    title: newsItem.header,
+                    icon: {
+                        // Your icon configuration
+                    },
                     animation: google.maps.Animation.DROP,
                 });
 
                 markersArray.push(marker);
 
-
                 const infowindow = new google.maps.InfoWindow({
-                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.type}</div>`,
+                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.header}</div>`,
                 });
 
-                infowindow.open(map, marker);
-                //marker.addListener('click', () => {
-                //  infowindow.open(map, marker);
-                //});
+                marker.addListener('click', () => {
+                    infowindow.open(map, marker);
+                });
             });
+            // Shuffle the array and slice it to get 5 random locations
         }
 
         function showModal(latitude, longitude, heading, summary) {
@@ -195,25 +166,32 @@
 
         function refreshMarkers(bounds) {
             clearMarkers();
-            newsData.forEach(function (newsItem) {
-                
-                // You can create markers or other elements based on this data
-                const marker = new google.maps.Marker({
-                    position: { lat: newsItem.lat, lng: newsItem.lng },
-                    map,
-                    title: "Holder",
-                    animation: google.maps.Animation.DROP,
-                });
-                NewsDataSet.push(marker);
+            allMarkers.forEach((location) => {
+                const latLng = new google.maps.LatLng(location[1], location[2]);
+                if (bounds.contains(latLng)) {
+                    const genNews = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.2 by fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M96 96c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H80c-44.2 0-80-35.8-80-80V128c0-17.7 14.3-32 32-32s32 14.3 32 32V400c0 8.8 7.2 16 16 16s16-7.2 16-16V96zm64 24v80c0 13.3 10.7 24 24 24H296c13.3 0 24-10.7 24-24V120c0-13.3-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm208-8c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zM160 304c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>`;
+                    const marker = new google.maps.Marker({
+                        position: { lat: location[1], lng: location[2] },
+                        map,
+                        title: "Click me!",
+                        icon: {
+                            url: 'data:image/svg+xml,' + encodeURIComponent(genNews), // Convert SVG to data URI
+                            scaledSize: new google.maps.Size(30, 30),
+                        },
+                        animation: google.maps.Animation.DROP,
+                    });
 
-                const infowindow = new google.maps.InfoWindow({
-                    content: `<div style="text-align:center;"><img src="${newsItem.img}" alt="${newsItem.header}" style="width:100px; cursor:pointer;" onclick="showModal(${newsItem.lat}, ${newsItem.lng}, '${newsItem.header}', '${newsItem.summary}')"><br>${newsItem.type}</div>`,
-                });
+                    markersArray.push(marker);
 
-                infowindow.open(map, marker);
-                //marker.addListener('click', () => {
-                //  infowindow.open(map, marker);
-                //});
+                    const infowindow = new google.maps.InfoWindow({
+                        content: `<div style="text-align:center;"><img src="${location[3]}" alt="${location[0]}" style="width:100px; cursor:pointer;" onclick="showModal(${location[1]}, ${location[2]}, '${location[4]}', '${location[5]}')"><br>${location[0]}</div>`,
+                    });
+
+                    infowindow.open(map, marker);
+                    //marker.addListener('click', () => {
+                    //  infowindow.open(map, marker);
+                    //});
+                }
             });
         }
 
